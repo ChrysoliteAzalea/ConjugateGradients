@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <mpi.h>
 using namespace std;
 
 double dabs(double x) {
@@ -113,6 +114,7 @@ int main(int argc,char *argv[]) {
 		printf("No file given.\n");
 		return 2;
 	}
+	MPI_Init(NULL, NULL);
 	int n;
 	char readthis[100];
 // Чтение файла
@@ -150,5 +152,6 @@ int main(int argc,char *argv[]) {
 	delete [] rightpart;
 	delete [] solution;
 	delete [] start;
+	MPI_Finalize();
 	return 0;
 }
