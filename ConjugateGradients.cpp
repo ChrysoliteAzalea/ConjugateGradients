@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <mpi.h>
+#include "MPIvectors.h"
 using namespace std;
 
 double dabs(double x) {
@@ -24,9 +25,11 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 // Невязка
 	double *r;
 	r=new double[n];
+	double *m;
+	m=new double[n];
 	#pragma omp parallel for private(i) {
-	for (int i=0;i<n;i++) r[i]=b[i];
-	for (int i=0;i<n;i++) for (int j=0;j<n;j++) r[i]-=a[i][j]*x0[j];
+	for (int i=0;i<n;i++) r[i]=b[i]-Multiply(a[i],x0,n);
+//	for (int i=0;i<n;i++) for (int j=0;j<n;j++) r[i]-=a[i][j]*x0[j];
 	#pragma omp parallel }
 // Направление
 	double *direction;
@@ -60,23 +63,27 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		b1=0;
 		b2=0;
 		#pragma omp parallel for private(i,j) {
-		for (int i=0;i<n;i++) a1+=r[i]*r[i];
+		a1=Multiply(r,r,n);
+//		for (int i=0;i<n;i++) a1+=r[i]*r[i];
 		for (int i=0;i<n;i++) for (int j=0;j<n;j++) a3[i]+=direction[j]*a[j][i];
 		#pragma omp parallel }
 		#pragma openmp parallel for private(i) {
-		for (int i=0;i<n;i++) a2+=a3[i]*direction[i];
+		a2=Multiply(a3,direction,n);
+//		for (int i=0;i<n;i++) a2+=a3[i]*direction[i];
 		#pragma omp parallel }
 		A=a1/a2;
 // Вычисление нового приближения
 		#pragma omp parallel for private(i,j) shared(n,ongoing,A,direction,a) {
 		for (int i=0;i<n;i++) ongoing[i]+=A*direction[i];
 // Вычисление новой невязки
-		for (int i=0;i<n;i++) for (int j=0;j<n;j++) r[i]-=A*a[i][j]*direction[j];
+		for (int i=0;i<n;i++) r[i]-=A*Multiply(a[i],direction,n); /*for (int j=0;j<n;j++) r[i]-=A*a[i][j]*direction[j]*/;
 		#pragma omp parallel }
 // Вычисление значения B
 		#pragma omp parallel for private(i,j) shared(n,b1,b2,r,oldr) {
-		for (int i=0;i<n;i++) b1+=r[i]*r[i];
-		for (int i=0;i<n;i++) b2+=oldr[i]*oldr[i];
+		b1=Multiply(r,r,n);
+//		for (int i=0;i<n;i++) b1+=r[i]*r[i];
+		b2=Multiply(oldr,oldr,n);
+//		for (int i=0;i<n;i++) b2+=oldr[i]*oldr[i];
 		#pragma omp parallel }
 		B=b1/b2;
 // Вычисление нового направления
@@ -87,7 +94,7 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		error=dabs(previous[0]-ongoing[0]);
 		#pragma omp parallel for private(i) {
 		for (int i=1;i<n;i++) error=dabs(previous[i]-ongoing[i])>error?dabs(previous[i]-ongoing[i]):error;
-		#pragma omp parallel }
+/* Не используется:		#pragma omp parallel }
 		double R=0;
 		#pragma omp parallel for private(i) shared(R,r) {
 		for (int i=0;i<n;i++) R+=r[i]*r[i];
@@ -95,7 +102,7 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		double D=0;
 		#pragma omp parallel for private(i) shared(D,direction) {
 		for (int i=0;i<n;i++) D+=direction[i]*direction[i];
-		#pragma omp parallel }
+		#pragma omp parallel }*/
 	}
 // Освобождение памяти и возвращение результата
 	for (int i=0;i<n;i++) x[i]=ongoing[i];
