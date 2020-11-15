@@ -1,5 +1,5 @@
-#include <iostream>
 #include <mpi.h>
+#include <iostream>
 using namespace std;
 
 double Multiply(double *X,double *Y,int N) {
