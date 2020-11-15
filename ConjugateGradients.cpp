@@ -64,8 +64,12 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		b2=0;
 		#pragma omp parallel for private(i,j) {
 		a1=Multiply(r,r,n);
+		double **transa;
+		transa=new double*[n];
+		for (int i=0;i<n;i++) transa[i]=new double[i];
+		for (int i=0;i<n;i++) for (int j=0;j<n;j++) transa[i][j]=a[j][i];
 //		for (int i=0;i<n;i++) a1+=r[i]*r[i];
-		for (int i=0;i<n;i++) for (int j=0;j<n;j++) a3[i]+=direction[j]*a[j][i];
+		for (int i=0;i<n;i++) a3[i]=Multiply(transa[i],direction,n); /*for (int j=0;j<n;j++) a3[i]+=direction[j]*a[j][i];*/
 		#pragma omp parallel }
 		#pragma openmp parallel for private(i) {
 		a2=Multiply(a3,direction,n);
@@ -110,6 +114,7 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 	delete [] r;
 	delete [] direction;
 	delete [] a3;
+	delete [] transa;
 	delete [] oldr;
 	delete [] oldp;
 	delete [] previous;
