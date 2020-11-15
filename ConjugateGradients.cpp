@@ -1,8 +1,9 @@
+#include <mpi.h>
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-#include <mpi.h>
 #include "MPIvectors.h"
+#include "MPImax.h"
 using namespace std;
 
 double dabs(double x) {
@@ -57,6 +58,11 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		for (int i=0;i<n;i++) oldr[i]=r[i];
 		for (int i=0;i<n;i++) oldp[i]=direction[i];
 		for (int i=0;i<n;i++) previous[i]=ongoing[i];
+		double **transa;
+		transa=new double*[n];
+		for (int i=0;i<n;i++) transa[i]=new double[i];
+		double *errors;
+		errors=new double[n];
 		#pragma omp parallel }
 		a1=0;
 		a2=0;
@@ -64,9 +70,6 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		b2=0;
 		#pragma omp parallel for private(i,j) {
 		a1=Multiply(r,r,n);
-		double **transa;
-		transa=new double*[n];
-		for (int i=0;i<n;i++) transa[i]=new double[i];
 		for (int i=0;i<n;i++) for (int j=0;j<n;j++) transa[i][j]=a[j][i];
 //		for (int i=0;i<n;i++) a1+=r[i]*r[i];
 		for (int i=0;i<n;i++) a3[i]=Multiply(transa[i],direction,n); /*for (int j=0;j<n;j++) a3[i]+=direction[j]*a[j][i];*/
@@ -95,9 +98,12 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		for (int i=0;i<n;i++) direction[i]=r[i]+B*direction[i];
 		#pragma omp parallel }
 // Вычисление погрешности
-		error=dabs(previous[0]-ongoing[0]);
+//		error=dabs(previous[0]-ongoing[0]);
 		#pragma omp parallel for private(i) {
-		for (int i=1;i<n;i++) error=dabs(previous[i]-ongoing[i])>error?dabs(previous[i]-ongoing[i]):error;
+		for (int i=0;i<n;i++) errors[i]=dabs(previous[i]-ongoing[i]);
+		error=Max(errors,n);
+//		for (int i=1;i<n;i++) error=dabs(previous[i]-ongoing[i])>error?dabs(previous[i]-ongoing[i]):error;
+		#pragma omp parallel }
 /* Не используется:		#pragma omp parallel }
 		double R=0;
 		#pragma omp parallel for private(i) shared(R,r) {
@@ -118,6 +124,7 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 	delete [] oldr;
 	delete [] oldp;
 	delete [] previous;
+	delete [] errors;
 	return;
 }
 
