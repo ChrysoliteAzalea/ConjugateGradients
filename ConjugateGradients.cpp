@@ -49,6 +49,11 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 	oldp=new double[n];
 	double *previous;
 	previous=new double[n];
+	double **transa;
+	transa=new double*[n];
+	for (int i=0;i<n;i++) transa[i]=new double[i];
+	double *errors;
+	errors=new double[n];
 // Поиск решения
 	while (error>=maxaccerr) {
 		count++;
@@ -58,11 +63,6 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		for (int i=0;i<n;i++) oldr[i]=r[i];
 		for (int i=0;i<n;i++) oldp[i]=direction[i];
 		for (int i=0;i<n;i++) previous[i]=ongoing[i];
-		double **transa;
-		transa=new double*[n];
-		for (int i=0;i<n;i++) transa[i]=new double[i];
-		double *errors;
-		errors=new double[n];
 		#pragma omp parallel }
 		a1=0;
 		a2=0;
