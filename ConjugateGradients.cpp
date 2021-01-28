@@ -53,6 +53,7 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 	double **transa;
 	transa=new double*[n];
 	for (int i=0;i<n;i++) transa[i]=new double[n];
+	for (int i=0;i<n;i++) for (int j=0;j<n;j++) transa[i][j]=a[j][i];
 // Поиск решения
 	while (error>=maxaccerr) {
 		count++;
