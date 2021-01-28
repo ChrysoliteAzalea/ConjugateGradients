@@ -71,8 +71,6 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		#pragma omp parallel for private(i,j) {
 		a1=Multiply(r,r,n);
 		for (int i=0;i<n;i++) for (int j=0;j<n;j++) a3[i]=Multiply(direction,transa[i],n);
-		#pragma omp parallel }
-		#pragma openmp parallel for private(i) {
 		a2=Multiply(a3,direction,n);
 		#pragma omp parallel }
 		A=a1/a2;
@@ -93,7 +91,6 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		for (int i=0;i<n;i++) direction[i]=r[i]+B*direction[i];
 		#pragma omp parallel }
 // Вычисление погрешности
-//		error=dabs(previous[0]-ongoing[0]);
 		#pragma omp parallel for private(i) {
 		for (int i=0;i<n;i++) errors[i]=dabs(previous[i]-ongoing[i]);
 		error=Max(errors,n);
