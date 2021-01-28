@@ -92,7 +92,8 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		B=b1/b2;
 // Вычисление нового направления
 		#pragma omp parallel for private(i) {
-		for (int i=0;i<n;i++) direction[i]=r[i]+B*direction[i];
+		MultVector(B,direction,m,n);
+		SumVectors(r,m,direction,n);
 		#pragma omp parallel }
 // Вычисление погрешности
 		#pragma omp parallel for private(i) {
