@@ -31,10 +31,10 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 	m=new double[n];
 	double *pre_r;
 	pre_r=new double[n];
-	for (int i=0;i<n;i++) pre_r[i]=-Multiply(a[i],x0,n);
 	#pragma omp parallel for private(i) {
-	for (int i=0;i<n;i++) SumVectors(b,pre_r,r,n);
+	for (int i=0;i<n;i++) pre_r[i]=-Multiply(a[i],x0,n);
 	#pragma omp parallel }
+	SumVectors(b,pre_r,r,n);
 // Направление
 	double *direction;
 	direction=new double[n];
