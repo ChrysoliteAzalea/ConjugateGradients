@@ -69,7 +69,6 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		#pragma omp parallel }
 		a1=0;
 		a2=0;
-		b1=0;
 		b2=0;
 		#pragma omp parallel for private(i,j) {
 		a1=checkpoint?b1:Multiply(r,r,n);
