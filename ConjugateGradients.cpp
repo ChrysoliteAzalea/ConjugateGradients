@@ -74,7 +74,7 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		b2=0;
 		#pragma omp parallel for private(i,j) {
 		a1=Multiply(r,r,n);
-		for (int i=0;i<n;i++) for (int j=0;j<n;j++) a3[i]=Multiply(direction,transa[i],n);
+		for (int i=0;i<n;i++) a3[i]=Multiply(direction,transa[i],n);
 		a2=Multiply(a3,direction,n);
 		#pragma omp parallel }
 		A=a1/a2;
