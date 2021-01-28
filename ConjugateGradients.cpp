@@ -5,11 +5,9 @@
 #include "MPIvectors.h"
 #include "MPImax.h"
 #include "MPIsumvectors.h"
+#include "MPIprod.h"
+#include "MPIerror.h"
 using namespace std;
-
-double dabs(double x) {
-	return x>=0?x:-x;
-}
 
 bool isSignificant(double x,double threshold) {
 	return dabs(x)>=threshold?true:false;
