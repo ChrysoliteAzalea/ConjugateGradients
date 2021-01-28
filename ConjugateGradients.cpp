@@ -42,6 +42,7 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 	double error=100;
 // Вспомогательные переменные
 	double A,a1,a2,B,b1,b2;
+	bool checkpoint=false;
 	double *a3;
 	a3=new double[n];
 	double *oldr;
@@ -71,7 +72,7 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 		b1=0;
 		b2=0;
 		#pragma omp parallel for private(i,j) {
-		a1=Multiply(r,r,n);
+		a1=checkpoint?b1:Multiply(r,r,n);
 		for (int i=0;i<n;i++) a3[i]=Multiply(direction,transa[i],n);
 		a2=Multiply(a3,direction,n);
 		#pragma omp parallel }
@@ -85,6 +86,7 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 // Вычисление значения B
 		#pragma omp parallel for private(i,j) shared(n,b1,b2,r,oldr) {
 		b1=Multiply(r,r,n);
+		checkpoint=true;
 		b2=Multiply(oldr,oldr,n);
 		#pragma omp parallel }
 		B=b1/b2;
