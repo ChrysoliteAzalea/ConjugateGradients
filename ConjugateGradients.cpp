@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include "MPIvectors.h"
 #include "MPImax.h"
+#include "MPIsumvectors.h"
 using namespace std;
 
 double dabs(double x) {
@@ -28,8 +29,11 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 	r=new double[n];
 	double *m;
 	m=new double[n];
+	double *pre_r;
+	pre_r=new double[n];
+	for (int i=0;i<n;i++) pre_r[i]=-Multiply(a[i],x0,n);
 	#pragma omp parallel for private(i) {
-	for (int i=0;i<n;i++) r[i]=b[i]-Multiply(a[i],x0,n);
+	for (int i=0;i<n;i++) SumVectors(b,pre_r,r,n);
 	#pragma omp parallel }
 // Направление
 	double *direction;
