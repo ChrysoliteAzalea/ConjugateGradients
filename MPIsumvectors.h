@@ -16,7 +16,7 @@ void SumVectors(double *X,double *Y,double *Z,int N) {
 	MPI_Scatter(X,N/world_size,MPI_DOUBLE,Xbuffer,N/world_size,MPI_DOUBLE,0,MPI_COMM_WORLD);
 	MPI_Scatter(Y,N/world_size,MPI_DOUBLE,Ybuffer,N/world_size,MPI_DOUBLE,0,MPI_COMM_WORLD);
 	for (int i=0;i<N/world_size;i++) curr[i]=Xbuffer[i]+Ybuffer[i];
-	MPI_Gather(curr,N/world_size,MPI_DOUBLE,Z,N/world_size,MPI_DOUBLE,0,MPI_COMM,WORLD);
+	MPI_Gather(curr,N/world_size,MPI_DOUBLE,Z,N/world_size,MPI_DOUBLE,0,MPI_COMM_WORLD);
 	delete [] Xbuffer;
 	delete [] Ybuffer;
 	delete [] curr;
