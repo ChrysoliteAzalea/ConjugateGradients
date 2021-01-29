@@ -41,7 +41,8 @@ void conjgrads(int n,double **a,double *b,double *x0,double *x,double maxaccerr)
 	#pragma omp parallel }
 	double error=100;
 // Вспомогательные переменные
-	double A,a1,a2,B,b1,b2;
+	double A,a1,a2,B,b2;
+	double b1=0;
 	bool checkpoint=false;
 	double *a3;
 	a3=new double[n];
